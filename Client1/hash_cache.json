@@ -1,0 +1,82 @@
+{
+  "6652fbf2358aa064c6ef653014e2f44c4f94dda680e9bd77e663a78c575b3277": {
+    "malicious": 0,
+    "undetected": 54,
+    "total": 75,
+    "file_name": "sahte_tehdit",
+    "checked_at": "2026-08-10 20:18:56",
+    "threat_label": "Bilinmiyor"
+  },
+  "d6f6c6b9fde37694e12b12009ad11ab9ec8dd0f193e7319c523933bdad8a50ad": {
+    "malicious": 55,
+    "undetected": 15,
+    "total": 75,
+    "file_name": "PotentiallyUnwanted.exe",
+    "checked_at": "2026-08-10 20:19:20",
+    "threat_label": "pua.test/amtso"
+  },
+  "e1105070ba828007508566e28a2b8d4c65d192e9eaf3b7868382b7cae747b397": {
+    "malicious": 53,
+    "undetected": 10,
+    "total": 75,
+    "file_name": "eicarcom2.zip",
+    "checked_at": "2026-08-10 20:19:33",
+    "threat_label": "virus.eicar/test"
+  },
+  "ada7ae87504ab53817b1611e6ab0f6f323e923b35d33457fc6d3e02d95985fd8": {
+    "malicious": 0,
+    "undetected": 58,
+    "total": 74,
+    "file_name": "Test.exe.pif",
+    "checked_at": "2026-08-11 08:57:33",
+    "threat_label": "Bilinmiyor"
+  },
+  "c8beca0fb4e54d8857f16ca4974410d5226e2e478e4da2880b4a5896b3dc64dd": {
+    "malicious": 3,
+    "undetected": 52,
+    "total": 75,
+    "file_name": "Test.dmg",
+    "checked_at": "2026-08-11 08:57:46",
+    "threat_label": "trojan.vsntbo23/nodeveloperinfodmg"
+  },
+  "0c88fb5d7c24ae18679b4ae2642515e963e597c2d0b6dafd9d0b93c5684b5365": {
+    "malicious": 0,
+    "undetected": 62,
+    "total": 77,
+    "file_name": "Test.bat",
+    "checked_at": "2026-08-11 08:57:58",
+    "threat_label": "Bilinmiyor"
+  },
+  "40427b1d089a7cf4a16060e07c9664f76598fb68d30ba261a947d28ac458718e": {
+    "malicious": 18,
+    "undetected": 45,
+    "total": 74,
+    "file_name": "Test 2.7z",
+    "checked_at": "2026-08-11 08:58:11",
+    "threat_label": "trojan.cyberessentials/malgent"
+  },
+  "fe17d97137655583bc1e32136e3a5a94cb1e7f3c0d415cfd981e8856dffb8c3d": {
+    "malicious": 19,
+    "undetected": 44,
+    "total": 75,
+    "file_name": "Test.jar",
+    "checked_at": "2026-08-11 08:58:47",
+    "threat_label": "trojan.java/abtrojan"
+  },
+  "fc28f3f1bdba2d576a6914205e5f4cf5ac7de1e311fde2620856918488da7a51": {
+    "malicious": 20,
+    "undetected": 45,
+    "total": 73,
+    "file_name": "Test.zip",
+    "checked_at": "2026-08-11 08:59:37",
+    "threat_label": "trojan.cyberessentials/abapplication"
+  },
+  "81151527aa1065f92ef28fc964202cffa378c786f777de38b900bf777dd3df01": {
+    "malicious": 14,
+    "undetected": 47,
+    "total": 76,
+    "file_name": "Test.gz",
+    "checked_at": "2026-08-11 08:59:50",
+    "threat_label": "trojan.cyberessentials"
+  }
+}

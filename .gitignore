@@ -1,0 +1,13 @@
+# Şifreler ve ortam değişkenleri
+.env
+
+# Python geçici dosyaları
+__pycache__/
+*.pyc
+
+# Mac sistem dosyaları
+.DS_Store
+
+# Loglar ve Raporlar (İstersen boş gidebilir)
+*.log
+reports/

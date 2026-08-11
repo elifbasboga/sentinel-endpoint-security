@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>SentinEL - Merkezi Güvenlik Paneli</title>
+<style>
+  :root {
+    --primary: #3DDC97;
+    --primary-dim: #2A9C6B;
+    --surface: #111C19;
+    --surface-alt: #16211E;
+    --border: #1E2E29;
+    --grey: #8FA39D;
+    --text: #E7F3EF;
+    --danger: #FF5C5C;
+    --danger-dim: #3A1414;
+    --bg: #0B1210;
+    --font-mono: "SFMono-Regular", "IBM Plex Mono", "JetBrains Mono", Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    margin: 0;
+    padding: 32px;
+    color: var(--text);
+  }
+  h1 {
+    color: var(--primary);
+    font-size: 26px;
+    margin: 0 0 4px 0;
+  }
+  .subtitle { color: var(--grey); margin-bottom: 24px; font-size: 13px; font-family: var(--font-mono); }
+
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: 16px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .live-badge {
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    font-family: var(--font-mono);
+    letter-spacing: 0.04em;
+    color: var(--primary);
+    padding: 4px 10px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--surface);
+    margin-top: 4px;
+  }
+  .live-badge.offline { color: var(--danger); }
+  .live-badge .status-dot { margin-right: 8px; }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .card {
+    background: var(--surface);
+    border-radius: 8px;
+    padding: 18px 20px;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--primary-dim);
+  }
+  .card.active-card { border-left-color: var(--primary); }
+  .card .label {
+    font-size: 12px;
+    color: var(--grey);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .card-icon {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    stroke: var(--grey);
+  }
+  .card.active-card .card-icon { stroke: var(--primary); }
+  .card .value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+    font-family: var(--font-mono);
+  }
+  .card.small .value { font-size: 16px; font-weight: 600; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface);
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  thead { background: var(--surface-alt); color: var(--grey); }
+  thead th {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+  }
+  th, td {
+    text-align: left;
+    padding: 12px 14px;
+    font-size: 13.5px;
+  }
+  td { font-family: var(--font-mono); }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.4s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:nth-child(even) { background: var(--surface-alt); }
+  tbody tr.new-row { animation: flash 1.2s ease-out; }
+  @keyframes flash {
+    0% { background: var(--danger-dim); }
+    100% { background: inherit; }
+  }
+  .badge {
+    display: inline-block;
+    background: var(--primary-dim);
+    color: var(--bg);
+    border-radius: 20px;
+    padding: 2px 10px;
+    font-size: 12px;
+    font-family: var(--font-mono);
+    margin-right: 4px;
+  }
+  .client-chip {
+    display: inline-block;
+    background: var(--surface-alt);
+    color: var(--primary);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 2px 8px;
+    font-size: 12px;
+    font-family: var(--font-mono);
+    margin: 2px 2px 0 0;
+  }
+  .empty-state {
+    text-align: center;
+    color: var(--grey);
+    padding: 40px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  .status-dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+  }
+  .status-dot.on {
+    background: var(--primary);
+    box-shadow: 0 0 0 0 rgba(61, 220, 151, 0.6);
+    animation: pulse 1.8s infinite;
+  }
+  .status-dot.off { background: #3A4744; }
+  .status-dot.alert { background: var(--danger); }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(61, 220, 151, 0.5); }
+    70% { box-shadow: 0 0 0 6px rgba(61, 220, 151, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(61, 220, 151, 0); }
+  }
+</style>
+</head>
+<body>
+
+  <div class="page-header">
+    <div>
+      <h1>SentinEL Merkezi Güvenlik Paneli</h1>
+      <div class="subtitle">canlı tehdit izleme · 5sn aralıkla güncelleniyor</div>
+    </div>
+    <div class="live-badge" id="live-badge">
+      <span class="status-dot on" id="live-dot"></span>
+      <span id="live-text">CANLI</span>
+    </div>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="label">
+        <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/></svg>
+        Toplam Tehdit
+      </div>
+      <div class="value" id="total-threats">-</div>
+    </div>
+    <div class="card">
+      <div class="label">
+        <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="13" rx="1.5"/><path d="M8 21h8M12 17v4"/></svg>
+        Toplam Clıent
+      </div>
+      <div class="value" id="total-clients">-</div>
+    </div>
+    <div class="card active-card">
+      <div class="label">
+        <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2-7 4 14 2-7h6"/></svg>
+        Aktif Clıent
+      </div>
+      <div class="value" id="active-clients">-</div>
+    </div>
+    <div class="card small">
+      <div class="label">
+        <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+        Son Veri Alma
+      </div>
+      <div class="value" id="last-received">-</div>
+    </div>
+  </div>
+
+  <table id="threat-table">
+    <thead>
+      <tr>
+        <th>Zararlı Türü</th>
+        <th>Etkilenen Client Sayısı</th>
+        <th>Client'lar</th>
+        <th>Son Görülme</th>
+      </tr>
+    </thead>
+    <tbody id="threat-tbody"></tbody>
+  </table>
+  <div class="empty-state" id="empty-state" style="display:none;">Henüz tehdit bildirimi yok.</div>
+
+  <h2 style="color:var(--primary); margin-top: 40px; font-size: 18px;">Client Durumu</h2>
+  <table id="clients-table">
+    <thead>
+      <tr><th>Client</th><th>Aktif Kullanıcı</th><th>Durum</th><th>Son Sinyal</th></tr>
+    </thead>
+    <tbody id="clients-tbody"></tbody>
+  </table>
+
+<script>
+const REFRESH_INTERVAL_MS = 5000;
+let knownThreatKeys = new Set();
+
+async function refreshDashboard() {
+  try {
+    const res = await fetch('/api/dashboard-data');
+    const data = await res.json();
+
+    document.getElementById('total-threats').textContent = data.total_threats;
+    document.getElementById('total-clients').textContent = data.total_clients;
+    document.getElementById('active-clients').textContent = data.active_clients;
+    document.getElementById('last-received').textContent = data.last_received_at || '—';
+
+    const liveBadge = document.getElementById('live-badge');
+    const liveDot = document.getElementById('live-dot');
+    liveBadge.classList.remove('offline');
+    liveDot.className = 'status-dot on';
+    document.getElementById('live-text').textContent = 'CANLI';
+
+    const tbody = document.getElementById('threat-tbody');
+    const emptyState = document.getElementById('empty-state');
+
+    if (data.threats.length === 0) {
+      tbody.innerHTML = '';
+      emptyState.style.display = 'block';
+    } else {
+      emptyState.style.display = 'none';
+      tbody.innerHTML = '';
+      data.threats.forEach(row => {
+        const rowKey = row.threat_label + '|' + row.last_seen;
+        const isNew = !knownThreatKeys.has(rowKey);
+        knownThreatKeys.add(rowKey);
+
+        const clientChips = row.clients.map(c =>
+          `<span class="client-chip">${c.hostname}</span>`
+        ).join('');
+
+        const tr = document.createElement('tr');
+        if (isNew) tr.className = 'new-row';
+        tr.innerHTML = `
+          <td><b>${row.threat_label}</b></td>
+          <td><span class="badge">${row.affected_client_count}</span></td>
+          <td>${clientChips}</td>
+          <td>${row.last_seen_readable}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    const clientsTbody = document.getElementById('clients-tbody');
+    clientsTbody.innerHTML = '';
+    data.clients.forEach(c => {
+      const tr = document.createElement('tr');
+      const dotClass = c.is_active ? 'on' : 'off';
+      const statusText = c.is_active ? 'Aktif' : 'Pasif';
+      const lastSignal = c.is_active
+        ? `${c.last_seen_seconds_ago}sn önce`
+        : c.last_seen_readable;
+      tr.innerHTML = `
+        <td>${c.hostname}</td>
+        <td>${c.active_user}</td>
+        <td><span class="status-dot ${dotClass}"></span>${statusText}</td>
+        <td>${lastSignal}</td>
+      `;
+      clientsTbody.appendChild(tr);
+    });
+
+  } catch (err) {
+    console.error('Dashboard verisi alinamadi:', err);
+    const liveBadge = document.getElementById('live-badge');
+    const liveDot = document.getElementById('live-dot');
+    liveBadge.classList.add('offline');
+    liveDot.className = 'status-dot alert';
+    document.getElementById('live-text').textContent = 'BAĞLANTI YOK';
+  }
+}
+
+refreshDashboard();
+setInterval(refreshDashboard, REFRESH_INTERVAL_MS);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,44 @@
+{
+  "watch_folder": "watched_files_3",
+
+  "//_scan_extensions_aciklama": "Bu uzantidaki dosyalar VirusTotal'a gonderilip taranir",
+  "scan_extensions": [
+    ".dmg", ".pkg", ".app", ".command",
+    ".sh", ".bash", ".zsh",
+    ".exe", ".msi", ".bat", ".cmd", ".ps1", ".vbs",
+    ".jar", ".apk", ".iso", ".bin", ".dll",
+    ".scr", ".com"
+  ],
+
+  "//_bypass_extensions_aciklama": "Bu uzantidaki dosyalar dogrudan gecirilir (tarama yapilmaz), sadece loglanir",
+  "bypass_extensions": [
+    ".doc", ".docx", ".pdf", ".txt", ".rtf",
+    ".xls", ".xlsx", ".csv",
+    ".ppt", ".pptx",
+    ".jpg", ".jpeg", ".png", ".gif", ".heic",
+    ".mp4", ".mov", ".mp3"
+  ],
+
+  "//_bilinmeyen_uzanti_aciklama": "scan_extensions ve bypass_extensions listesinde olmayan bir uzanti gelirse ne yapilacak: 'scan' veya 'bypass'",
+  "default_action_for_unknown_extension": "scan",
+
+  "//_stability_check_aciklama": "Dosyanin yazilmasi tamamlandi mi diye boyut kontrolu (saniye)",
+  "stability_check_interval_seconds": 2,
+  "stability_check_retries": 5,
+
+  "//_poll_interval_aciklama": "VT analiz sonucu icin kac saniyede bir sorgu atilacak. Public API dakikada 4 istege izin verir (~15sn/istek); bunun altina inersen 429 hatasi alma riski artar",
+  "poll_interval_seconds": 10,
+  "poll_timeout_seconds": 180,
+
+  "//_hash_cache_aciklama": "Daha once VT'de sorgulanan hash'lerin sonucu burada saklanir. Ayni hash tekrar gelirse VT'ye hic sorgu atilmadan, dogrudan buradan (blacklist/cache) cevap verilir -> hem hizli hem rate limit dostu",
+  "hash_cache_file": "hash_cache.json",
+
+  "//_heartbeat_aciklama": "Servis bos beklerken (yeni dosya gelmezken) 'sistem sorunsuz calisiyor' logunun kac saniyede bir basilacagi",
+  "heartbeat_interval_seconds": 300,
+
+  "//_report_interval_aciklama": "Yoneticiye kac saniyede bir rapor atilacak (Orn: 1 saat = 3600, test icin 5 dk = 300)",
+  "report_interval_seconds": 300,
+  "report_recipient_email": "basbogadilanelif@gmail.com",
+
+  "central_server_url": "http://localhost:8000"
+}

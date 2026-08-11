@@ -1,0 +1,119 @@
+[
+  {
+    "hostname": "Client-2-MacBook",
+    "active_user": "fatmayildiz",
+    "threat_label": "trojan.cyberessentials/malgent",
+    "file_name": "Test.7z",
+    "location": "/Users/dilanelifbasboga/Desktop/sentinEL/Client2/watched_files_2/karantina/Test.7z",
+    "timestamp": 1786426996.607805,
+    "received_at": "2026-08-11T05:43:16.607828+00:00"
+  },
+  {
+    "hostname": "Client-1-MacBook",
+    "active_user": "dilanelifbasboga",
+    "threat_label": "trojan.vsntbo23/nodeveloperinfodmg",
+    "file_name": "Test.dmg",
+    "location": "/Users/dilanelifbasboga/Desktop/sentinEL/Client1/watched_files_1/karantina/Test.dmg",
+    "timestamp": 1786427866.266585,
+    "received_at": "2026-08-11T05:57:46.266595+00:00"
+  },
+  {
+    "hostname": "Client-2-MacBook",
+    "active_user": "fatmayildiz",
+    "threat_label": "trojan.cyberessentials/abapplication",
+    "file_name": "Test.msi",
+    "location": "/Users/dilanelifbasboga/Desktop/sentinEL/Client2/watched_files_2/karantina/Test.msi",
+    "timestamp": 1786427883.270185,
+    "received_at": "2026-08-11T05:58:03.270195+00:00"
+  },
+  {
+    "hostname": "Client-1-MacBook",
+    "active_user": "dilanelifbasboga",
+    "threat_label": "trojan.cyberessentials/malgent",
+    "file_name": "Test 2.7z",
+    "location": "/Users/dilanelifbasboga/Desktop/sentinEL/Client1/watched_files_1/karantina/Test 2.7z",
+    "timestamp": 1786427891.6074162,
+    "received_at": "2026-08-11T05:58:11.607428+00:00"
+  },
+  {
+    "hostname": "Client-1-MacBook",
+    "active_user": "dilanelifbasboga",
+    "threat_label": "trojan.java/abtrojan",
+    "file_name": "Test.jar",
+    "location": "/Users/dilanelifbasboga/Desktop/sentinEL/Client1/watched_files_1/karantina/Test.jar",
+    "timestamp": 1786427927.6176782,
+    "received_at": "2026-08-11T05:58:47.617687+00:00"
+  },
+  {
+    "hostname": "Client-2-MacBook",
+    "active_user": "fatmayildiz",
+    "threat_label": "trojan.cyberessentials/abapplication",
+    "file_name": "Test.tar",
+    "location": "/Users/dilanelifbasboga/Desktop/sentinEL/Client2/watched_files_2/karantina/Test.tar",
+    "timestamp": 1786427935.6398048,
+    "received_at": "2026-08-11T05:58:55.639814+00:00"
+  },
+  {
+    "hostname": "Client-1-MacBook",
+    "active_user": "dilanelifbasboga",
+    "threat_label": "virus.eicar/test",
+    "file_name": "eicarcom2.zip",
+    "location": "/Users/dilanelifbasboga/Desktop/sentinEL/Client1/watched_files_1/karantina/eicarcom2.zip",
+    "timestamp": 1786427939.6642601,
+    "received_at": "2026-08-11T05:58:59.664269+00:00"
+  },
+  {
+    "hostname": "Client-2-MacBook",
+    "active_user": "fatmayildiz",
+    "threat_label": "trojan.cyberessentials",
+    "file_name": "Test.rar",
+    "location": "/Users/dilanelifbasboga/Desktop/sentinEL/Client2/watched_files_2/karantina/Test.rar",
+    "timestamp": 1786427961.341768,
+    "received_at": "2026-08-11T05:59:21.341777+00:00"
+  },
+  {
+    "hostname": "Client-1-MacBook",
+    "active_user": "dilanelifbasboga",
+    "threat_label": "trojan.cyberessentials/abapplication",
+    "file_name": "Test.zip",
+    "location": "/Users/dilanelifbasboga/Desktop/sentinEL/Client1/watched_files_1/karantina/Test.zip",
+    "timestamp": 1786427977.731264,
+    "received_at": "2026-08-11T05:59:37.731272+00:00"
+  },
+  {
+    "hostname": "Client-2-MacBook",
+    "active_user": "fatmayildiz",
+    "threat_label": "virus.eicar/test",
+    "file_name": "eicar_com.zip",
+    "location": "/Users/dilanelifbasboga/Desktop/sentinEL/Client2/watched_files_2/karantina/eicar_com.zip",
+    "timestamp": 1786427981.6535199,
+    "received_at": "2026-08-11T05:59:41.653528+00:00"
+  },
+  {
+    "hostname": "Client-1-MacBook",
+    "active_user": "dilanelifbasboga",
+    "threat_label": "trojan.cyberessentials",
+    "file_name": "Test.gz",
+    "location": "/Users/dilanelifbasboga/Desktop/sentinEL/Client1/watched_files_1/karantina/Test.gz",
+    "timestamp": 1786427990.423624,
+    "received_at": "2026-08-11T05:59:50.423635+00:00"
+  },
+  {
+    "hostname": "Client-2-MacBook",
+    "active_user": "fatmayildiz",
+    "threat_label": "trojan.amtso/test",
+    "file_name": "com.amtso.mobiletestfilepua.apk",
+    "location": "/Users/dilanelifbasboga/Desktop/sentinEL/Client2/watched_files_2/karantina/com.amtso.mobiletestfilepua.apk",
+    "timestamp": 1786427994.184706,
+    "received_at": "2026-08-11T05:59:54.184712+00:00"
+  },
+  {
+    "hostname": "Client-2-MacBook",
+    "active_user": "fatmayildiz",
+    "threat_label": "trojan.vsnw18b23",
+    "file_name": "CEPlusDMG.dmg",
+    "location": "/Users/dilanelifbasboga/Desktop/sentinEL/Client2/watched_files_2/karantina/CEPlusDMG.dmg",
+    "timestamp": 1786428007.5473201,
+    "received_at": "2026-08-11T06:00:07.547326+00:00"
+  }
+]
