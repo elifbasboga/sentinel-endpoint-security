@@ -38,7 +38,7 @@
 
   "//_report_interval_aciklama": "Yoneticiye kac saniyede bir rapor atilacak (Orn: 1 saat = 3600, test icin 5 dk = 300)",
   "report_interval_seconds": 300,
-  "report_recipient_email": "basbogadilanelif@gmail.com",
+  "report_recipient_email": "ornek_mail@gmail.com",
 
   "central_server_url": "http://localhost:8000"
 }
