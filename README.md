@@ -47,8 +47,6 @@ SMTP_EMAIL=gonderici_mail@gmail.com
 SMTP_APP_PASSWORD=gmail_uygulama_sifresi
 ```
 
-> **Not:** `.env` dosyanızı GitHub'a yüklemeyin. API anahtarları ve uygulama şifreleri gibi hassas bilgileri güvenli tutun.
-
 ### 4. Sistemi Başlatın
 
 Önce merkezi sunucuyu ayağa kaldırın:
@@ -143,8 +141,6 @@ SentinEL aşağıdaki güvenlik mekanizmalarını kullanır:
 - Otomatik karantina
 - Heartbeat tabanlı istemci takibi
 - Çevre değişkenleri üzerinden hassas bilgilerin yönetimi
-
-> **Önemli:** API anahtarları, SMTP şifreleri ve diğer hassas bilgileri kaynak kodu içerisinde doğrudan saklamayın.
 
 ## 📄 Lisans
 
