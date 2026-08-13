@@ -1,50 +1,42 @@
 {
-  "6652fbf2358aa064c6ef653014e2f44c4f94dda680e9bd77e663a78c575b3277": {
-    "malicious": 0,
-    "undetected": 54,
+  "2546dcffc5ad854d4ddc64fbf056871cd5a00f2471cb7a5bfd4ac23b6e9eedad": {
+    "malicious": 57,
+    "undetected": 8,
     "total": 75,
-    "file_name": "sahte_tehdit",
-    "checked_at": "2026-08-10 20:18:56",
-    "threat_label": "Bilinmiyor"
-  },
-  "d6f6c6b9fde37694e12b12009ad11ab9ec8dd0f193e7319c523933bdad8a50ad": {
-    "malicious": 55,
-    "undetected": 15,
-    "total": 75,
-    "file_name": "PotentiallyUnwanted.exe",
-    "checked_at": "2026-08-10 20:19:20",
-    "threat_label": "pua.test/amtso"
-  },
-  "e1105070ba828007508566e28a2b8d4c65d192e9eaf3b7868382b7cae747b397": {
-    "malicious": 53,
-    "undetected": 10,
-    "total": 75,
-    "file_name": "eicarcom2.zip",
-    "checked_at": "2026-08-10 20:19:33",
+    "file_name": "eicar_com.zip",
+    "checked_at": "2026-08-12 13:50:04",
     "threat_label": "virus.eicar/test"
-  },
-  "ada7ae87504ab53817b1611e6ab0f6f323e923b35d33457fc6d3e02d95985fd8": {
-    "malicious": 0,
-    "undetected": 58,
-    "total": 74,
-    "file_name": "Test.exe.pif",
-    "checked_at": "2026-08-11 08:57:33",
-    "threat_label": "Bilinmiyor"
   },
   "c8beca0fb4e54d8857f16ca4974410d5226e2e478e4da2880b4a5896b3dc64dd": {
     "malicious": 3,
     "undetected": 52,
     "total": 75,
     "file_name": "Test.dmg",
-    "checked_at": "2026-08-11 08:57:46",
+    "checked_at": "2026-08-12 14:04:27",
     "threat_label": "trojan.vsntbo23/nodeveloperinfodmg"
   },
-  "0c88fb5d7c24ae18679b4ae2642515e963e597c2d0b6dafd9d0b93c5684b5365": {
+  "ada7ae87504ab53817b1611e6ab0f6f323e923b35d33457fc6d3e02d95985fd8": {
     "malicious": 0,
-    "undetected": 62,
-    "total": 77,
-    "file_name": "Test.bat",
-    "checked_at": "2026-08-11 08:57:58",
+    "undetected": 58,
+    "total": 74,
+    "file_name": "Test.exe.pif",
+    "checked_at": "2026-08-12 14:11:32",
+    "threat_label": "Bilinmiyor"
+  },
+  "81151527aa1065f92ef28fc964202cffa378c786f777de38b900bf777dd3df01": {
+    "malicious": 14,
+    "undetected": 47,
+    "total": 76,
+    "file_name": "Test.gz",
+    "checked_at": "2026-08-12 14:11:46",
+    "threat_label": "trojan.cyberessentials"
+  },
+  "44e69fa140a64b5fb3e252f871721cb82880d571edf5d264160fde0a90ce30f3": {
+    "malicious": 0,
+    "undetected": 60,
+    "total": 75,
+    "file_name": ".DS_Store",
+    "checked_at": "2026-08-12 14:22:47",
     "threat_label": "Bilinmiyor"
   },
   "40427b1d089a7cf4a16060e07c9664f76598fb68d30ba261a947d28ac458718e": {
@@ -52,31 +44,103 @@
     "undetected": 45,
     "total": 74,
     "file_name": "Test 2.7z",
-    "checked_at": "2026-08-11 08:58:11",
+    "checked_at": "2026-08-12 14:23:11",
     "threat_label": "trojan.cyberessentials/malgent"
   },
-  "fe17d97137655583bc1e32136e3a5a94cb1e7f3c0d415cfd981e8856dffb8c3d": {
-    "malicious": 19,
+  "0c88fb5d7c24ae18679b4ae2642515e963e597c2d0b6dafd9d0b93c5684b5365": {
+    "malicious": 0,
+    "undetected": 62,
+    "total": 77,
+    "file_name": "Test.bat",
+    "checked_at": "2026-08-12 14:23:36",
+    "threat_label": "Bilinmiyor"
+  },
+  "6652fbf2358aa064c6ef653014e2f44c4f94dda680e9bd77e663a78c575b3277": {
+    "malicious": 0,
+    "undetected": 54,
+    "total": 75,
+    "file_name": "sahte_tehdit",
+    "checked_at": "2026-08-12 14:24:13",
+    "threat_label": "Bilinmiyor"
+  },
+  "6ecc6de19d0013d4b035d7641c1a149fa8aa74d9f53684c10d0db458e37b3604": {
+    "malicious": 3,
+    "undetected": 59,
+    "total": 76,
+    "file_name": "CEPlusDMG.dmg",
+    "checked_at": "2026-08-12 14:50:37",
+    "threat_label": "trojan.vsnw18b23"
+  },
+  "ddf1967721baa3579812474e24d6bac823dd732399a5601bff34945fe1cf4858": {
+    "malicious": 17,
     "undetected": 44,
     "total": 75,
-    "file_name": "Test.jar",
-    "checked_at": "2026-08-11 08:58:47",
-    "threat_label": "trojan.java/abtrojan"
+    "file_name": "Test(1).msi",
+    "checked_at": "2026-08-12 14:51:02",
+    "threat_label": "trojan.cyberessentials/abapplication"
+  },
+  "e2a17c30a21f9d8430fdff09ccd0aa71e261ce9e9188d8f2ec54ae8593f725ca": {
+    "malicious": 0,
+    "undetected": 63,
+    "total": 76,
+    "file_name": "Test.ps1",
+    "checked_at": "2026-08-12 14:52:15",
+    "threat_label": "Bilinmiyor"
+  },
+  "bf56a197e3009ef982f80d9f3f01dd5cf343ceb50adbba4de9a7f1e42c9aa8b1": {
+    "malicious": 0,
+    "undetected": 63,
+    "total": 76,
+    "file_name": "Test.py",
+    "checked_at": "2026-08-12 14:52:28",
+    "threat_label": "Bilinmiyor"
+  },
+  "e4c0e0021e5918e1f9d8a48fe6ac6a92014311ec06501f6fec5240c8d317a820": {
+    "malicious": 0,
+    "undetected": 53,
+    "total": 75,
+    "file_name": "Test.sh",
+    "checked_at": "2026-08-12 14:52:41",
+    "threat_label": "Bilinmiyor"
   },
   "fc28f3f1bdba2d576a6914205e5f4cf5ac7de1e311fde2620856918488da7a51": {
     "malicious": 20,
     "undetected": 45,
     "total": 73,
     "file_name": "Test.zip",
-    "checked_at": "2026-08-11 08:59:37",
+    "checked_at": "2026-08-12 14:52:53",
     "threat_label": "trojan.cyberessentials/abapplication"
   },
-  "81151527aa1065f92ef28fc964202cffa378c786f777de38b900bf777dd3df01": {
-    "malicious": 14,
-    "undetected": 47,
+  "5b0c73d928c3dd80006b74e715e05ff035149be6fb80c272ca583b9f78bcb73b": {
+    "malicious": 39,
+    "undetected": 27,
+    "total": 74,
+    "file_name": "com.amtso.mobiletestfilepua.apk",
+    "checked_at": "2026-08-12 14:53:27",
+    "threat_label": "trojan.amtso/test"
+  },
+  "e1105070ba828007508566e28a2b8d4c65d192e9eaf3b7868382b7cae747b397": {
+    "malicious": 48,
+    "undetected": 8,
+    "total": 74,
+    "file_name": "eicarcom2.zip",
+    "checked_at": "2026-08-12 14:53:51",
+    "threat_label": "virus.eicar/test"
+  },
+  "58b48f2272fba4e462f744490784eccd72909e49e16b5d1c001f26d265f0a39e": {
+    "malicious": 16,
+    "undetected": 48,
     "total": 76,
-    "file_name": "Test.gz",
-    "checked_at": "2026-08-11 08:59:50",
+    "file_name": "Test.rar",
+    "checked_at": "2026-08-12 15:03:15",
     "threat_label": "trojan.cyberessentials"
+  },
+  "bafca81b35144d4ac432a3bfe3857616c0d4aa89cd269565cdeec7ef815be40a": {
+    "malicious": 0,
+    "undetected": 59,
+    "total": 75,
+    "file_name": ".DS_Store",
+    "checked_at": "2026-08-13 08:26:26",
+    "threat_label": "Bilinmiyor"
   }
 }

@@ -166,6 +166,172 @@
   }
   .status-dot.off { background: #3A4744; }
   .status-dot.alert { background: var(--danger); }
+
+  .filter-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .filter-bar input[type="text"],
+  .filter-bar input[type="date"],
+  .filter-bar select {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    padding: 7px 10px;
+    border-radius: 6px;
+    outline: none;
+  }
+  .filter-bar input[type="text"] { flex: 1; min-width: 180px; }
+  .filter-bar input[type="text"]:focus,
+  .filter-bar input[type="date"]:focus,
+  .filter-bar select:focus { border-color: var(--primary-dim); }
+  .filter-bar label {
+    font-size: 11px;
+    color: var(--grey);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-right: -4px;
+  }
+  .filter-clear {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--grey);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding: 7px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .filter-clear:hover { color: var(--text); border-color: var(--grey); }
+  .filter-count {
+    font-size: 12px;
+    color: var(--grey);
+    font-family: var(--font-mono);
+    margin-bottom: 10px;
+  }
+
+  tbody tr.clickable-row { cursor: pointer; }
+  tbody tr.clickable-row:hover { background: var(--surface-alt); }
+
+  .panel-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    z-index: 40;
+  }
+  .panel-backdrop.open { opacity: 1; pointer-events: auto; }
+
+  .detail-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 400px;
+    max-width: 90vw;
+    background: var(--surface);
+    border-left: 1px solid var(--border);
+    box-shadow: -8px 0 24px rgba(0, 0, 0, 0.35);
+    transform: translateX(100%);
+    transition: transform 0.22s ease;
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+  }
+  .detail-panel.open { transform: translateX(0); }
+
+  .detail-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 20px 20px 16px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .detail-panel-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--primary);
+    font-family: var(--font-mono);
+    word-break: break-word;
+    padding-right: 12px;
+  }
+  .detail-panel-close {
+    background: transparent;
+    border: none;
+    color: var(--grey);
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 2px 4px;
+  }
+  .detail-panel-close:hover { color: var(--text); }
+
+  .detail-panel-body {
+    padding: 18px 20px;
+    overflow-y: auto;
+    flex: 1;
+  }
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .detail-row:last-child { border-bottom: none; }
+  .detail-row .k {
+    color: var(--grey);
+    font-family: var(--font-mono);
+    flex-shrink: 0;
+  }
+  .detail-row .v {
+    color: var(--text);
+    font-family: var(--font-mono);
+    text-align: right;
+    word-break: break-word;
+  }
+  .detail-section-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--grey);
+    margin: 18px 0 8px 0;
+  }
+  .detail-client-block {
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+  }
+  .detail-client-block .host {
+    color: var(--primary);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .license-badge {
+    display: inline-block;
+    border-radius: 20px;
+    padding: 2px 10px;
+    font-size: 12px;
+    font-family: var(--font-mono);
+  }
+  .license-badge.active { background: var(--primary-dim); color: var(--bg); }
+  .license-badge.expired,
+  .license-badge.no_license,
+  .license-badge.revoked { background: var(--danger-dim); color: var(--danger); }
+  .days-remaining.warning { color: var(--danger); font-weight: 700; }
   @keyframes pulse {
     0% { box-shadow: 0 0 0 0 rgba(61, 220, 151, 0.5); }
     70% { box-shadow: 0 0 0 6px rgba(61, 220, 151, 0); }
@@ -217,6 +383,20 @@
     </div>
   </div>
 
+  <div class="filter-bar">
+    <input type="text" id="filter-search" placeholder="Ara: zararlı türü veya client adı...">
+    <label>Client</label>
+    <select id="filter-client">
+      <option value="">Tümü</option>
+    </select>
+    <label>Tarih</label>
+    <input type="date" id="filter-date-from">
+    <span style="color:var(--grey); font-size:12px;">–</span>
+    <input type="date" id="filter-date-to">
+    <button class="filter-clear" id="filter-clear-btn">Temizle</button>
+  </div>
+  <div class="filter-count" id="filter-count"></div>
+
   <table id="threat-table">
     <thead>
       <tr>
@@ -238,9 +418,194 @@
     <tbody id="clients-tbody"></tbody>
   </table>
 
+  <h2 style="color:var(--primary); margin-top: 40px; font-size: 18px;">Security Center — Lisans Durumu</h2>
+  <table id="license-table">
+    <thead>
+      <tr><th>Client</th><th>Plan</th><th>Durum</th><th>Bitiş Tarihi</th><th>Kalan Gün</th><th>Son Kontrol</th></tr>
+    </thead>
+    <tbody id="license-tbody"></tbody>
+  </table>
+  <div class="empty-state" id="license-empty-state" style="display:none;">Henüz kayıtlı lisans yok.</div>
+
+  <div class="panel-backdrop" id="panel-backdrop"></div>
+  <div class="detail-panel" id="detail-panel">
+    <div class="detail-panel-header">
+      <div class="detail-panel-title" id="detail-panel-title">—</div>
+      <button class="detail-panel-close" id="detail-panel-close">✕</button>
+    </div>
+    <div class="detail-panel-body" id="detail-panel-body"></div>
+  </div>
+
 <script>
 const REFRESH_INTERVAL_MS = 5000;
 let knownThreatKeys = new Set();
+let allThreatRows = [];       // sunucudan gelen ham veri, filtre uygulanmadan once
+let knownClientNames = new Set();
+let latestLicenseByHost = {}; // hostname -> license kaydi (detay panelinde capraz referans icin)
+
+// ---------------------------------------------------------------------------
+// Detay Paneli (satira tiklaninca acilan yan panel)
+// ---------------------------------------------------------------------------
+function esc(str) {
+  const d = document.createElement('div');
+  d.textContent = str ?? '';
+  return d.innerHTML;
+}
+
+function openPanel(title, bodyHtml) {
+  document.getElementById('detail-panel-title').textContent = title;
+  document.getElementById('detail-panel-body').innerHTML = bodyHtml;
+  document.getElementById('detail-panel').classList.add('open');
+  document.getElementById('panel-backdrop').classList.add('open');
+}
+
+function closePanel() {
+  document.getElementById('detail-panel').classList.remove('open');
+  document.getElementById('panel-backdrop').classList.remove('open');
+}
+
+document.getElementById('detail-panel-close').addEventListener('click', closePanel);
+document.getElementById('panel-backdrop').addEventListener('click', closePanel);
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePanel(); });
+
+function detailRow(k, v) {
+  return `<div class="detail-row"><span class="k">${esc(k)}</span><span class="v">${esc(v)}</span></div>`;
+}
+
+function openThreatDetail(row) {
+  let html = '';
+  html += detailRow('Etkilenen client sayısı', row.affected_client_count);
+  html += detailRow('Son görülme', row.last_seen_readable);
+
+  html += `<div class="detail-section-title">Etkilenen Client'lar</div>`;
+  row.clients.forEach(c => {
+    html += `<div class="detail-client-block">
+      <div class="host">${esc(c.hostname)}</div>
+      ${detailRow('Kullanıcı', c.active_user)}
+      ${detailRow('Dosya', c.file_name)}
+      ${detailRow('Konum', c.location || '—')}
+      ${detailRow('Zaman', new Date(c.timestamp * 1000).toLocaleString('tr-TR'))}
+    </div>`;
+  });
+
+  openPanel(row.threat_label, html);
+}
+
+function openClientDetail(c) {
+  let html = '';
+  html += detailRow('Aktif kullanıcı', c.active_user);
+  html += detailRow('Durum', c.is_active ? 'Aktif' : 'Pasif');
+  html += detailRow('Son sinyal', c.is_active ? `${c.last_seen_seconds_ago}sn önce` : c.last_seen_readable);
+
+  const lic = latestLicenseByHost[c.hostname];
+  if (lic) {
+    html += `<div class="detail-section-title">Lisans</div>`;
+    html += detailRow('Plan', lic.plan || '—');
+    html += detailRow('Durum', lic.status);
+    html += detailRow('Bitiş tarihi', lic.expires_at ? new Date(lic.expires_at).toLocaleDateString('tr-TR') : '—');
+    html += detailRow('Kalan gün', lic.days_remaining ?? '—');
+    html += detailRow('Son kontrol', lic.last_check_in ? new Date(lic.last_check_in).toLocaleString('tr-TR') : 'Hiç bağlanmadı');
+  }
+
+  openPanel(c.hostname, html);
+}
+
+function getActiveFilters() {
+  return {
+    search: document.getElementById('filter-search').value.trim().toLowerCase(),
+    client: document.getElementById('filter-client').value,
+    dateFrom: document.getElementById('filter-date-from').value,   // "YYYY-MM-DD" ya da ""
+    dateTo: document.getElementById('filter-date-to').value,
+  };
+}
+
+function rowMatchesFilters(row, filters) {
+  if (filters.search) {
+    const hostnames = row.clients.map(c => c.hostname.toLowerCase()).join(' ');
+    const haystack = (row.threat_label.toLowerCase() + ' ' + hostnames);
+    if (!haystack.includes(filters.search)) return false;
+  }
+  if (filters.client) {
+    const hasClient = row.clients.some(c => c.hostname === filters.client);
+    if (!hasClient) return false;
+  }
+  if (filters.dateFrom || filters.dateTo) {
+    const rowDate = new Date(row.last_seen * 1000);
+    if (filters.dateFrom) {
+      const from = new Date(filters.dateFrom + 'T00:00:00');
+      if (rowDate < from) return false;
+    }
+    if (filters.dateTo) {
+      const to = new Date(filters.dateTo + 'T23:59:59');
+      if (rowDate > to) return false;
+    }
+  }
+  return true;
+}
+
+function renderThreatTable() {
+  const filters = getActiveFilters();
+  const filtered = allThreatRows.filter(row => rowMatchesFilters(row, filters));
+
+  const tbody = document.getElementById('threat-tbody');
+  const emptyState = document.getElementById('empty-state');
+  const countEl = document.getElementById('filter-count');
+
+  const anyFilterActive = filters.search || filters.client || filters.dateFrom || filters.dateTo;
+  countEl.textContent = anyFilterActive
+    ? `${filtered.length} / ${allThreatRows.length} kayıt gösteriliyor`
+    : '';
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = '';
+    emptyState.style.display = 'block';
+    emptyState.textContent = allThreatRows.length === 0
+      ? 'Henüz tehdit bildirimi yok.'
+      : 'Filtreyle eşleşen kayıt yok.';
+  } else {
+    emptyState.style.display = 'none';
+    tbody.innerHTML = '';
+    filtered.forEach(row => {
+      const rowKey = row.threat_label + '|' + row.last_seen;
+      const isNew = !knownThreatKeys.has(rowKey);
+      knownThreatKeys.add(rowKey);
+
+      const clientChips = row.clients.map(c =>
+        `<span class="client-chip">${c.hostname}</span>`
+      ).join('');
+
+      const tr = document.createElement('tr');
+      if (isNew) tr.className = 'new-row clickable-row';
+      else tr.className = 'clickable-row';
+      tr.innerHTML = `
+        <td><b>${row.threat_label}</b></td>
+        <td><span class="badge">${row.affected_client_count}</span></td>
+        <td>${clientChips}</td>
+        <td>${row.last_seen_readable}</td>
+      `;
+      tr.addEventListener('click', () => openThreatDetail(row));
+      tbody.appendChild(tr);
+    });
+  }
+}
+
+function updateClientFilterOptions(clientNames) {
+  const select = document.getElementById('filter-client');
+  const current = select.value;
+  const newNames = [...clientNames].sort();
+  const existing = new Set([...select.options].map(o => o.value));
+
+  // Sadece yeni client'lar icin option ekle - mevcut secimi bozma
+  newNames.forEach(name => {
+    if (!existing.has(name)) {
+      const opt = document.createElement('option');
+      opt.value = name;
+      opt.textContent = name;
+      select.appendChild(opt);
+    }
+  });
+  select.value = current; // secimi koru
+}
 
 async function refreshDashboard() {
   try {
@@ -258,40 +623,16 @@ async function refreshDashboard() {
     liveDot.className = 'status-dot on';
     document.getElementById('live-text').textContent = 'CANLI';
 
-    const tbody = document.getElementById('threat-tbody');
-    const emptyState = document.getElementById('empty-state');
-
-    if (data.threats.length === 0) {
-      tbody.innerHTML = '';
-      emptyState.style.display = 'block';
-    } else {
-      emptyState.style.display = 'none';
-      tbody.innerHTML = '';
-      data.threats.forEach(row => {
-        const rowKey = row.threat_label + '|' + row.last_seen;
-        const isNew = !knownThreatKeys.has(rowKey);
-        knownThreatKeys.add(rowKey);
-
-        const clientChips = row.clients.map(c =>
-          `<span class="client-chip">${c.hostname}</span>`
-        ).join('');
-
-        const tr = document.createElement('tr');
-        if (isNew) tr.className = 'new-row';
-        tr.innerHTML = `
-          <td><b>${row.threat_label}</b></td>
-          <td><span class="badge">${row.affected_client_count}</span></td>
-          <td>${clientChips}</td>
-          <td>${row.last_seen_readable}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
+    allThreatRows = data.threats;
+    data.threats.forEach(row => row.clients.forEach(c => knownClientNames.add(c.hostname)));
+    updateClientFilterOptions(knownClientNames);
+    renderThreatTable();
 
     const clientsTbody = document.getElementById('clients-tbody');
     clientsTbody.innerHTML = '';
     data.clients.forEach(c => {
       const tr = document.createElement('tr');
+      tr.className = 'clickable-row';
       const dotClass = c.is_active ? 'on' : 'off';
       const statusText = c.is_active ? 'Aktif' : 'Pasif';
       const lastSignal = c.is_active
@@ -303,6 +644,7 @@ async function refreshDashboard() {
         <td><span class="status-dot ${dotClass}"></span>${statusText}</td>
         <td>${lastSignal}</td>
       `;
+      tr.addEventListener('click', () => openClientDetail(c));
       clientsTbody.appendChild(tr);
     });
 
@@ -316,8 +658,74 @@ async function refreshDashboard() {
   }
 }
 
+async function refreshLicenseStatus() {
+  try {
+    const res = await fetch('/api/license/status');
+    const data = await res.json();
+
+    const tbody = document.getElementById('license-tbody');
+    const emptyState = document.getElementById('license-empty-state');
+
+    if (!data.licenses || data.licenses.length === 0) {
+      tbody.innerHTML = '';
+      emptyState.style.display = 'block';
+      return;
+    }
+    emptyState.style.display = 'none';
+    tbody.innerHTML = '';
+    latestLicenseByHost = {};
+
+    data.licenses.forEach(lic => {
+      latestLicenseByHost[lic.hostname] = lic;
+      const tr = document.createElement('tr');
+      tr.className = 'clickable-row';
+      const daysRemaining = lic.days_remaining;
+      const isLow = daysRemaining !== null && daysRemaining <= 7 && lic.status === 'active';
+      const daysText = daysRemaining === null ? '—' : `${daysRemaining} gün`;
+      const lastCheck = lic.last_check_in
+        ? new Date(lic.last_check_in).toLocaleString('tr-TR')
+        : 'Hiç bağlanmadı';
+
+      tr.innerHTML = `
+        <td>${lic.hostname || '—'}</td>
+        <td>${lic.plan || '—'}</td>
+        <td><span class="license-badge ${lic.status}">${lic.status}</span></td>
+        <td>${lic.expires_at ? new Date(lic.expires_at).toLocaleDateString('tr-TR') : '—'}</td>
+        <td class="days-remaining ${isLow ? 'warning' : ''}">${daysText}</td>
+        <td>${lastCheck}</td>
+      `;
+      tr.addEventListener('click', () => {
+        let html = '';
+        html += detailRow('Plan', lic.plan || '—');
+        html += detailRow('Durum', lic.status);
+        html += detailRow('Bitiş tarihi', lic.expires_at ? new Date(lic.expires_at).toLocaleDateString('tr-TR') : '—');
+        html += detailRow('Kalan gün', daysText);
+        html += detailRow('Son kontrol', lastCheck);
+        openPanel(lic.hostname || 'Lisans Detayı', html);
+      });
+      tbody.appendChild(tr);
+    });
+  } catch (err) {
+    console.error('Lisans verisi alinamadi:', err);
+  }
+}
+
 refreshDashboard();
+refreshLicenseStatus();
 setInterval(refreshDashboard, REFRESH_INTERVAL_MS);
+setInterval(refreshLicenseStatus, REFRESH_INTERVAL_MS);
+
+// Filtreler degistikce, sunucuya tekrar sormadan mevcut veriyi yeniden ciz
+['filter-search', 'filter-client', 'filter-date-from', 'filter-date-to'].forEach(id => {
+  document.getElementById(id).addEventListener('input', renderThreatTable);
+});
+document.getElementById('filter-clear-btn').addEventListener('click', () => {
+  document.getElementById('filter-search').value = '';
+  document.getElementById('filter-client').value = '';
+  document.getElementById('filter-date-from').value = '';
+  document.getElementById('filter-date-to').value = '';
+  renderThreatTable();
+});
 </script>
 
 </body>

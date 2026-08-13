@@ -16,7 +16,8 @@
     ".xls", ".xlsx", ".csv",
     ".ppt", ".pptx",
     ".jpg", ".jpeg", ".png", ".gif", ".heic",
-    ".mp4", ".mov", ".mp3"
+    ".mp4", ".mov", ".mp3",
+    ".DS_Store"
   ],
 
   "//_bilinmeyen_uzanti_aciklama": "scan_extensions ve bypass_extensions listesinde olmayan bir uzanti gelirse ne yapilacak: 'scan' veya 'bypass'",
@@ -28,7 +29,7 @@
 
   "//_poll_interval_aciklama": "VT analiz sonucu icin kac saniyede bir sorgu atilacak. Public API dakikada 4 istege izin verir (~15sn/istek); bunun altina inersen 429 hatasi alma riski artar",
   "poll_interval_seconds": 10,
-  "poll_timeout_seconds": 180,
+  "poll_timeout_seconds": 300,
 
   "//_hash_cache_aciklama": "Daha once VT'de sorgulanan hash'lerin sonucu burada saklanir. Ayni hash tekrar gelirse VT'ye hic sorgu atilmadan, dogrudan buradan (blacklist/cache) cevap verilir -> hem hizli hem rate limit dostu",
   "hash_cache_file": "hash_cache.json",

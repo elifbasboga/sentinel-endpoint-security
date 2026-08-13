@@ -26,8 +26,22 @@ import time
 from datetime import datetime
 from pathlib import Path
 
-import requests
-from dotenv import load_dotenv
+try:
+    import requests
+except ImportError:
+    requests = None
+
+try:
+    import importlib.util
+
+    if importlib.util.find_spec("dotenv") is not None:
+        from dotenv import load_dotenv
+    else:
+        def load_dotenv(*args, **kwargs):
+            return False
+except Exception:
+    def load_dotenv(*args, **kwargs):
+        return False
 
 # Script'in bulunduğu klasor - .env, reports/ vb. hep buna gore bulunur,
 # calistigin yer (terminal / VS Code Run butonu / farkli klasor) fark etmez.
@@ -87,6 +101,56 @@ def upload_file(path: Path) -> str:
         resp = requests.post(upload_url, headers=headers, files=files)
     resp.raise_for_status()
     return resp.json()["data"]["id"]  # analysis id
+
+
+def get_remaining_quota(log=None) -> dict | None:
+    """
+    VirusTotal hesabinin gunluk/saatlik/aylik API istek kotasini sorgular.
+    Donus: {"daily_used": int, "daily_allowed": int, "daily_remaining": int,
+            "hourly_used": int, "hourly_allowed": int, "hourly_remaining": int}
+    Basarisiz olursa None doner (servis akisini durdurmaz).
+    """
+    if not API_KEY:
+        return None
+
+    url = f"{BASE_URL}/users/{API_KEY}"
+    if log:
+        log.info(f"  ├─ istek atildi -> GET {url} (kota sorgusu)")
+
+    try:
+        headers = {"x-apikey": API_KEY}
+        resp = requests.get(url, headers=headers, timeout=10)
+        if resp.status_code != 200:
+            if log:
+                log.warning(f"  │        yanit alindi -> beklenmeyen durum kodu: HTTP {resp.status_code}, kota gosterilemiyor")
+            return None
+
+        quotas = resp.json().get("data", {}).get("attributes", {}).get("quotas", {})
+        daily = quotas.get("api_requests_daily", {})
+        hourly = quotas.get("api_requests_hourly", {})
+
+        result = {
+            "daily_used": daily.get("used", 0),
+            "daily_allowed": daily.get("allowed", 0),
+            "daily_remaining": max(daily.get("allowed", 0) - daily.get("used", 0), 0),
+            "hourly_used": hourly.get("used", 0),
+            "hourly_allowed": hourly.get("allowed", 0),
+            "hourly_remaining": max(hourly.get("allowed", 0) - hourly.get("used", 0), 0),
+        }
+
+        if log:
+            log.info(
+                f"  └─ yanit alindi -> gunluk: {result['daily_used']}/{result['daily_allowed']} "
+                f"kullanildi ({result['daily_remaining']} sorgu kaldi)  |  "
+                f"saatlik: {result['hourly_used']}/{result['hourly_allowed']} "
+                f"({result['hourly_remaining']} kaldi)"
+            )
+        return result
+
+    except requests.exceptions.RequestException as e:
+        if log:
+            log.warning(f"  │        kota sorgusu basarisiz ({e.__class__.__name__}), atlaniyor")
+        return None
 
 
 def poll_analysis(analysis_id: str, interval: int = 15, timeout: int = 300) -> dict:

@@ -32,6 +32,7 @@ import logging
 import shutil
 import sys
 import time
+import traceback
 from pathlib import Path
 
 import requests
@@ -39,12 +40,14 @@ from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 
 from central_reporter import load_client_identity, start_heartbeat_thread, report_threat
+from license_manager import LicenseManager 
 
 # vt_scan.py icindeki fonksiyonlari yeniden kullaniyoruz
 from vt_scan import (
     API_KEY,
     BASE_URL,
     get_report_by_hash,
+    get_remaining_quota,
     poll_analysis,
     sha256_of_file,
     upload_file,
@@ -82,7 +85,7 @@ REPORTS_DIR = BASE_DIR / "reports"
 
 # Merkezi sunucu entegrasyonu (opsiyonel - config.json'da tanimli degilse
 # hicbir sey degismez, watcher.py eskisi gibi tek-basina calisir)
-CLIENT_IDENTITY = load_client_identity(BASE_DIR)
+CLIENT_IDENTITY = load_client_identity(BASE_DIR, log=None)
 
 # ---------------------------------------------------------------------------
 # Loglama: watcher.log'a duz metin, terminale renkli yazar
@@ -162,6 +165,30 @@ def load_hash_cache(cache_path: Path) -> dict:
 def save_hash_cache(cache_path: Path, cache: dict):
     with open(cache_path, "w", encoding="utf-8") as f:
         json.dump(cache, f, indent=2, ensure_ascii=False)
+
+
+def load_processed_state(state_path: Path) -> dict:
+    """
+    Daha once (bu calistirmada ya da onceki bir calistirmada) islenmis
+    dosyalarin kaydini tutar. Format: { "<dosya_adi>": {"size": <int>,
+    "mtime": <float>} }. Bu, TEMIZ ya da BYPASS edilen dosyalarin -
+    karantinaya tasinan zararlilarin aksine - klasorde oldugu yerde
+    kalmasi yuzunden servis her yeniden baslatildiginda tekrar tekrar
+    "yeni dosya" gibi islenmesini engellemek icin kullanilir.
+    """
+    if not state_path.exists():
+        return {}
+    try:
+        with open(state_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except (json.JSONDecodeError, OSError):
+        log.warning("processed_files.json okunamadi, bos durum ile baslaniyor.")
+        return {}
+
+
+def save_processed_state(state_path: Path, state: dict):
+    with open(state_path, "w", encoding="utf-8") as f:
+        json.dump(state, f, indent=2, ensure_ascii=False)
 
 
 def check_vt_connection() -> bool:
@@ -393,18 +420,42 @@ def scan_file(path: Path, config: dict, hash_cache: dict, cache_path: Path):
 
 class WatchHandler(FileSystemEventHandler):
     def __init__(self, config: dict, watch_folder: Path, hash_cache: dict, cache_path: Path,
-                 detected_threats: list, scan_stats: dict):
+                 detected_threats: list, scan_stats: dict, license_manager=None,
+                 processed_state: dict = None, processed_state_path: Path = None):
         self.config = config
         self.watch_folder = watch_folder
         self.hash_cache = hash_cache
         self.cache_path = cache_path
         self.detected_threats = detected_threats  # SADECE zararli cikanlar (mail tablosu icin)
         self.scan_stats = scan_stats  # taranan TUM dosya sayisi
+        self.license_manager = license_manager 
         self.quarantine_dir = watch_folder / "karantina"
         self.quarantine_dir.mkdir(exist_ok=True)
+        self.processed_state = processed_state if processed_state is not None else {}
+        self.processed_state_path = processed_state_path
 
         self.interval = config.get("stability_check_interval_seconds", 2)
         self.retries = config.get("stability_check_retries", 5)
+
+    def _mark_processed(self, path: Path):
+        """
+        Dosya klasorde oldugu yerde kaldiginda (temiz cikti ya da bypass
+        edildi) bunu processed_files.json'a kaydeder - boylece bir sonraki
+        baslangic taramasi ayni degismemis dosyayi tekrar islemez. Dosya
+        daha sonra degistirilirse (boyut/mtime farklilasirsa) yine yeni
+        dosya gibi ele alinir.
+        """
+        if self.processed_state_path is None:
+            return
+        try:
+            st = path.stat()
+        except OSError:
+            return
+        self.processed_state[path.name] = {"size": st.st_size, "mtime": st.st_mtime}
+        try:
+            save_processed_state(self.processed_state_path, self.processed_state)
+        except OSError as e:
+            log.error(f"  · processed_files.json diske yazilamadi: {e}")
 
     def _is_relevant(self, path: Path) -> bool:
         # karantina/ alt klasorundeki hareketleri yoksay (yoksa sonsuz dongu olur)
@@ -415,10 +466,29 @@ class WatchHandler(FileSystemEventHandler):
         return True
 
     def _handle(self, path: Path):
+        """
+        DIKKAT: Bu metod watchdog'un arka plandaki observer/dispatch
+        thread'i tarafindan cagrilir. Icinde yakalanmamis bir exception
+        firlarsa o thread SESSIZCE olebilir - servis "calisiyor" gibi
+        gorunmeye devam eder (ana dongu etkilenmez) ama bir DAHA HICBIR
+        yeni dosya olayi (on_created/on_moved) islenmez, sanki servis
+        yeni dosyalari "gormezden geliyormus" gibi bir izlenim verir.
+        Bu yuzden asagidaki TUM isleme mantigi genis bir try/except ile
+        sarilidir - beklenmeyen HERHANGI bir hata sadece loglanir,
+        thread'i asla oldurmez, servis bir sonraki dosyayi normal
+        sekilde islemeye devam eder.
+        """
         if not self._is_relevant(path):
             return
+        try:
+            self._handle_inner(path)
+        except Exception as e:
+            log.error(f"  └─ ✗ Dosya islenirken beklenmeyen hata olustu ({path.name}): {e}")
+            log.error(f"  └─ ✗ Hata detayi (traceback): {traceback.format_exc(limit=3)}")
+        finally:
+            log.info("─" * 60)
 
-        log.info("─" * 60)
+    def _handle_inner(self, path: Path):
         log.info(f"YENI DOSYA  : {path.name}")
         if not wait_until_stable(path, self.interval, self.retries):
             log.warning(f"  ✗ Dosya kayboldu/tasindi, atlaniyor: {path.name}")
@@ -428,6 +498,10 @@ class WatchHandler(FileSystemEventHandler):
         action = decide_action(path, self.config)
 
         if action == "scan":
+            if self.license_manager and not self.license_manager.is_active():
+                print("License not found")
+                log.error(f"  └─ ✗ License not found - tarama iptal edildi: {path.name}")
+                return
             malicious, threat_label = scan_file(path, self.config, self.hash_cache, self.cache_path)
             self.scan_stats["total_scanned"] += 1
 
@@ -452,15 +526,15 @@ class WatchHandler(FileSystemEventHandler):
                 if server_url:
                     report_threat(
                         server_url, CLIENT_IDENTITY, threat_label,
-                        path.name, str(dest.resolve()), log=log,
+                        path.name, str(dest.resolve()), base_dir=BASE_DIR, log=log,
                     )
             else:
                 log.info(f"  └─ temiz bulundu, dosya oldugu yerde kaldi: {path.name}")
+                self._mark_processed(path)
         else:
             # Guvenli dosya - klasorunde oldugu yerde kalir, hicbir yere tasinmaz.
             log.info(f"  └─ guvenli turu ('{path.suffix}', orn. Word/PDF/resim) -> tarama atlandi, dosya oldugu yerde kaldi")
-
-        log.info("─" * 60)
+            self._mark_processed(path)
 
     def on_created(self, event):
         if not event.is_directory:
@@ -472,12 +546,83 @@ class WatchHandler(FileSystemEventHandler):
             self._handle(Path(event.dest_path))
 
 
+def _scan_existing_files(handler: "WatchHandler", watch_folder: Path, processed_state: dict):
+    """
+    ONEMLI: watchdog'un Observer'i SADECE observer.start() cagrisindan
+    SONRA olusan dosya sistemi olaylarini (on_created/on_moved) yakalar.
+    Servis kapaliyken (ya da bir onceki calistirmada kapatilirken/Ctrl+C
+    ile durdurulurken) klasore birakilmis dosyalar icin HICBIR olay
+    tetiklenmez - bu yuzden bu dosyalar sessizce "atlanmis" gibi kalirdi.
+
+    Bu fonksiyon servis her baslatildiginda watch_folder'daki mevcut
+    dosyalari (karantina/ alt klasoru haric) listeler. TEMIZ/BYPASS
+    edilmis ve daha once islendigi processed_files.json'da kayitli olan
+    (boyut+mtime degismemis) dosyalar TEKRAR islenmez - aksi halde her
+    servis yeniden baslatildiginda ayni degismemis dosyalar sonsuza dek
+    "yeni dosya" gibi tekrar tekrar taranir/loglanirdi. Sadece GERCEKTEN
+    yeni olan (ya da daha once basarisiz/lisanssiz kaldigi icin kaydi
+    olmayan) dosyalar islenir.
+    """
+    try:
+        existing = sorted(p for p in watch_folder.iterdir() if p.is_file())
+    except OSError as e:
+        log.error(f"✗ Baslangic taramasi icin klasor listelenemedi: {e}")
+        return
+
+    if not existing:
+        log.info("Baslangic taramasi: klasorde bekleyen dosya bulunamadi")
+        return
+
+    pending = []
+    skipped = 0
+    for path in existing:
+        try:
+            st = path.stat()
+        except OSError:
+            continue
+        recorded = processed_state.get(path.name)
+        if recorded and recorded.get("size") == st.st_size and recorded.get("mtime") == st.st_mtime:
+            skipped += 1
+            continue
+        pending.append(path)
+
+    if skipped:
+        log.info(f"Baslangic taramasi: {skipped} dosya daha once islendigi ve degismedigi icin atlandi")
+
+    if not pending:
+        log.info("Baslangic taramasi: yeni/degismis dosya bulunamadi")
+        return
+
+    log.info("─" * 60)
+    log.info(f"BASLANGIC TARAMASI: {len(pending)} bekleyen dosya bulundu "
+              f"(servis kapaliyken/kapatilirken birakilmis olabilir)")
+    for path in pending:
+        handler._handle(path)
+    log.info(f"BASLANGIC TARAMASI TAMAMLANDI ({len(pending)} dosya islendi)")
+    log.info("─" * 60)
+
+
 def main():
     log.info("╔" + "═" * 58 + "╗")
     log.info("║{:^58}║".format("SentinEL ENDPOINT SECURITY"))
     log.info("╚" + "═" * 58 + "╝")
 
     config = load_config()
+
+    # Rapor e-postasinin alici adresi hala "ornek" degeriyle birakilmis mi
+    # diye erkenden kontrol et - aksi halde SMTP sunucusu mesaji "kabul
+    # edildi" der (log "basariyla iletildi" gosterir), ama alici gercekte
+    # yoktur ve teslimat SAATLER SONRA, sessizce (script'in goremeyecegi
+    # bir "iade/bounce" maili olarak) basarisiz olur.
+    recipient = config.get("report_recipient_email", "")
+    _PLACEHOLDER_RECIPIENTS = {"ornek_mail@gmail.com", "example@example.com", ""}
+    if recipient in _PLACEHOLDER_RECIPIENTS:
+        log.warning(
+            f"config.json -> report_recipient_email HALA ORNEK/BOS DEGER ('{recipient}'). "
+            "Rapor e-postalari SMTP sunucusu tarafindan 'kabul edildi' gorunecek ama "
+            "gercek alici olmadigi icin teslim edilmeyecek (iade maili saatler sonra gelir, "
+            "bu servis onu goremez). Lutfen gercek bir adresle degistirin."
+        )
 
     watch_folder_value = config["watch_folder"]
     watch_folder = Path(watch_folder_value)
@@ -491,6 +636,9 @@ def main():
         cache_path = BASE_DIR / cache_path
     hash_cache = load_hash_cache(cache_path)
 
+    processed_state_path = BASE_DIR / "processed_files.json"
+    processed_state = load_processed_state(processed_state_path)
+
     connected = check_vt_connection()
     if not connected:
         log.error("✗ VirusTotal'a baglanilamadi. .env / internet baglantisini kontrol edip tekrar dene.")
@@ -501,12 +649,29 @@ def main():
     log.info(f"  {'Taranacak':<16}: {len(config['scan_extensions'])} uzanti  ({', '.join(config['scan_extensions'][:6])}, ...)")
     log.info(f"  {'Guvenli/bypass':<16}: {len(config['bypass_extensions'])} uzanti  ({', '.join(config['bypass_extensions'][:6])}, ...)")
     log.info(f"  {'Hash cache':<16}: {len(hash_cache)} kayit")
+    log.info(f"  {'Islenmis dosya':<16}: {len(processed_state)} kayit (processed_files.json)")
     log.info(f"  {'Poll araligi':<16}: {config.get('poll_interval_seconds', 10)}sn")
 
+    license_manager = None
     server_url = config.get("central_server_url")
     if server_url:
-        start_heartbeat_thread(server_url, CLIENT_IDENTITY, log=log)
+        start_heartbeat_thread(server_url, CLIENT_IDENTITY, base_dir=BASE_DIR, log=log)
         log.info(f"  {'Merkezi sunucu':<16}: {server_url}  (client: {CLIENT_IDENTITY['hostname']})")
+
+        license_manager = LicenseManager(
+            BASE_DIR, server_url, CLIENT_IDENTITY,
+            refresh_minutes=config.get("license_check_interval_minutes", 60),
+            grace_period_hours=config.get("license_grace_period_hours", 12),
+            log=log,
+        )
+        # Başlangıçta senkron bir kontrol - servis "hazır" demeden önce
+        # lisans durumu netleşsin (ama servis lisanssızsa bile ÇÖKMEZ,
+        # sadece tarama devre dışı kalır - heartbeat/report akışı etkilenmez).
+        if license_manager.validate_now():
+            log.info(f"  {'Lisans':<16}: AKTİF")
+        else:
+            log.error(f"  {'Lisans':<16}: BULUNAMADI/GEÇERSİZ - tarama devre dışı, düzeltilene kadar bekleniyor")
+        license_manager.start_refresh_thread()
 
     log.info("─" * 60)
     log.info("Servis hazir, klasor izleniyor.")
@@ -514,12 +679,21 @@ def main():
 
     detected_threats = []  # SADECE zararli cikan dosyalar (mail tablosu icin)
     scan_stats = {"total_scanned": 0}  # taranan TUM dosya sayisi (temiz+zararli)
-    handler = WatchHandler(config, watch_folder, hash_cache, cache_path, detected_threats, scan_stats)
+    handler = WatchHandler(
+        config, watch_folder, hash_cache, cache_path, detected_threats, scan_stats,
+        license_manager=license_manager,
+        processed_state=processed_state, processed_state_path=processed_state_path,
+    )
 
     # Observer arka planda izlemeyi baslatiyor:
     observer = Observer()
     observer.schedule(handler, str(watch_folder), recursive=False)
     observer.start()
+
+    # Observer sadece BUNDAN SONRAKI olaylari yakalar - klasorde onceden
+    # birakilmis, henuz islenmemis (ya da degismis) dosyalar varsa simdi
+    # onlari isle. Daha once islenip degismeden kalan dosyalar atlanir.
+    _scan_existing_files(handler, watch_folder, processed_state)
 
     # Iki ayri sayacimiz ve suremiz var:
     report_interval = config.get("report_interval_seconds", 300)
@@ -576,7 +750,14 @@ def main():
                         success = send_email_with_attachment(pdf_path, subject, config)
 
                         if success:
-                            log.info(f"  └─ Yoneticiye basariyla e-posta iletildi: {pdf_name}")
+                            log.info(
+                                f"  └─ E-posta SMTP sunucusuna teslim edildi (sunucu 'kabul edildi' yaniti verdi): {pdf_name}"
+                            )
+                            log.info(
+                                "     · NOT: bu, mesajin nihai olarak alicinin kutusuna ULASTIGI anlamina GELMEZ - "
+                                "adres hatali/yoksa iade (bounce) bildirimi SAATLER SONRA, ayri bir e-posta olarak "
+                                "gelir ve bu servis tarafindan izlenmez. Alici adresini ve gelen kutusunu kontrol edin."
+                            )
                             detected_threats.clear()
                             scan_stats["total_scanned"] = 0
                         else:
